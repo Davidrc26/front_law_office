@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
   templateUrl: './reg-client.component.html',
   styleUrl: './reg-client.component.scss'
 })
-export class RegClientComponent {
+export default class RegClientComponent {
   client = {
     name: '',
     lastName: '',

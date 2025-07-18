@@ -13,7 +13,7 @@ import { ClientService } from '../../services/client.service';
   templateUrl: './cases-overview.component.html',
   styleUrl: './cases-overview.component.scss'
 })
-export class CasesOverviewComponent {
+export default class CasesOverviewComponent {
 
   cases: any[] = [];
   areaId: number = 4; // Cambia esto según el área que necesites

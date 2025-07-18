@@ -22,7 +22,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
   templateUrl: './interview-form.component.html',
   styleUrl: './interview-form.component.scss'
 })
-export class InterviewFormComponent {
+export default class InterviewFormComponent {
 
   interview = {
     factualDescription: '',

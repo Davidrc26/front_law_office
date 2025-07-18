@@ -6,6 +6,10 @@ import { ButtonModule } from 'primeng/button';
 import { HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
+import { AlertService } from '../../services/alerts.service';
+import { LoginResponse } from '../../models/loginresponse';
+import { Router } from '@angular/router';
 declare const google: any;
 
 @Component({
@@ -15,18 +19,15 @@ declare const google: any;
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export default class LoginComponent {
   username: string = '';
   password: string = '';
 
-  // Inyección de HttpClient (Angular standalone)
-  http = inject(HttpClient);
 
-  /**
-   * Maneja el evento de inicio de sesión.
-   * Imprime el usuario y la contraseña en consola.
-   * Aquí se puede agregar la lógica para validar credenciales, llamar a una API o redirigir al usuario.
-   */
+  authService = inject(AuthService);
+  alertService = inject(AlertService);
+  router = inject(Router);
+
   onLogin() {
     console.log('Usuario:', this.username);
     console.log('Contraseña:', this.password);
@@ -42,16 +43,27 @@ export class LoginComponent {
   }
 
   handleCredentialResponse(response: any) {
+    console.log('hola');
     const token = response.credential;
-    // Envía el token a tu backend
-    this.http.post('/api/auth/google', { token }).subscribe({
+    this.authService.validateGoogleToken(token).subscribe({
       next: (res) => {
-        // Maneja el login exitoso (redirige, guarda usuario, etc.)
-        alert('Login con Google exitoso');
+        this.alertService.success('Login exitoso');
+
+        this.handleResponse(res);
       },
       error: (err) => {
         alert('Error al iniciar sesión con Google');
       }
     });
   }
+
+ handleResponse(res: LoginResponse) {
+  localStorage.setItem('token', res.token);
+  localStorage.setItem('user', JSON.stringify(res.user));
+  if(res.user.roles.length == 0) {
+    this.router.navigate(['/select-role']);
+  } else {
+    this.router.navigate(['/home']);
+  }
+ }
 }

@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
   templateUrl: './socioeconomic-form.component.html',
   styleUrl: './socioeconomic-form.component.scss'
 })
-export class SocioeconomicFormComponent {
+export default class SocioeconomicFormComponent {
   client = {
     name: '',
     lastName: '',

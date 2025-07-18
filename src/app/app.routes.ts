@@ -1,18 +1,14 @@
 import { Routes } from '@angular/router';
-import { RegClientComponent } from './forms/reg-client/reg-client.component';
-import { SocioeconomicFormComponent } from './forms/socioeconomic-form/socioeconomic-form.component';
-import { CasesOverviewComponent } from './views/cases-overview/cases-overview.component';
-import { InterviewFormComponent } from './forms/interview-form/interview-form.component';
-import { DashboardComponent } from './views/dashboard/dashboard.component';
-import { UserSignUpComponent } from './forms/user-sign-up/user-sign-up.component';
-import { LoginComponent } from './forms/login/login.component';
-
 export const routes: Routes = [
-    { path: '', component: CasesOverviewComponent },
-    { path: 'datos-cliente', component: RegClientComponent },
-    { path: 'socioeconomico', component: SocioeconomicFormComponent },
-    { path: 'entrevista', component:  InterviewFormComponent},
-    { path: 'dashboard/:id',  component: DashboardComponent },
-    { path: 'registro',  component: UserSignUpComponent }, 
-    { path: 'login', component: LoginComponent}
+    { path: '', loadComponent: () => import('./views/cases-overview/cases-overview.component')},
+    { path: 'datos-cliente', loadComponent: () => import('./forms/reg-client/reg-client.component')},
+    { path: 'socioeconomico', loadComponent: () => import('./forms/socioeconomic-form/socioeconomic-form.component')},
+    { path: 'entrevista', loadComponent: () => import('./forms/interview-form/interview-form.component')},
+    { path: 'dashboard/:id', loadComponent: () => import('./views/dashboard/dashboard.component')},
+    { path: 'registro', loadComponent: () => import('./forms/user-sign-up/user-sign-up.component')}, 
+    { path: 'login', loadComponent: () => import('./forms/login/login.component')},
+    { path: 'select-role', loadComponent: () => import('./forms/select-role/select-role.component').then(m => m.default) },
+    { path: 'perfil-teacher', loadComponent: () => import('./forms/perfil-teacher/perfil-teacher.component').then(m => m.default) },
+    { path: 'perfil-assistant', loadComponent: () => import('./forms/perfil-assistant/perfil-assistant.component').then(m => m.default) },
+    { path: 'perfil-student', loadComponent: () => import('./forms/perfil-student/perfil-student.component').then(m => m.default) },
 ];

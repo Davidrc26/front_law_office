@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
   templateUrl: './user-sign-up.component.html',
   styleUrl: './user-sign-up.component.scss'
 })
-export class UserSignUpComponent implements OnInit {
+export default class UserSignUpComponent implements OnInit {
   form!: FormGroup;
   allUsernames: string[] = [];
   usernameTaken = false;
