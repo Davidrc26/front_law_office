@@ -1,0 +1,272 @@
+<form [formGroup]="userForm" (ngSubmit)="handleSubmit()" class="user-form">
+
+  <!-- Sección: Información Básica -->
+  <div class="form-section">
+    <h3 class="section-title">Información Básica</h3>
+    
+    <div class="form-row">
+      <!-- Nombre de usuario -->
+      <div class="form-group">
+        <label for="username">Nombre de Usuario <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          [class.error]="hasError('username')"
+          placeholder="Ingrese nombre de usuario">
+        <span class="error-message" *ngIf="hasError('username')">
+          {{ getErrorMessage('username') }}
+        </span>
+      </div>
+
+      <!-- Rol -->
+      <div class="form-group">
+        <label for="roleId">Rol <span class="required">*</span></label>
+        <select 
+          id="roleId" 
+          formControlName="roleId"
+          [class.error]="hasError('roleId')">
+          <option value="">Seleccione un rol</option>
+          <option *ngFor="let role of roles" [value]="role.id">
+            {{ role.spanishName }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="hasError('roleId')">
+          {{ getErrorMessage('roleId') }}
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="name">Nombre <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name"
+          [class.error]="hasError('name')"
+          placeholder="Ingrese nombre">
+        <span class="error-message" *ngIf="hasError('name')">
+          {{ getErrorMessage('name') }}
+        </span>
+      </div>
+
+      <!-- Apellido -->
+      <div class="form-group">
+        <label for="lastName">Apellido <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="lastName" 
+          formControlName="lastName"
+          [class.error]="hasError('lastName')"
+          placeholder="Ingrese apellido">
+        <span class="error-message" *ngIf="hasError('lastName')">
+          {{ getErrorMessage('lastName') }}
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Correo Electrónico <span class="required">*</span></label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          [class.error]="hasError('email')"
+          placeholder="ejemplo@correo.com">
+        <span class="error-message" *ngIf="hasError('email')">
+          {{ getErrorMessage('email') }}
+        </span>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="form-group">
+        <label for="phone">Teléfono <span class="required">*</span></label>
+        <input 
+          type="tel" 
+          id="phone" 
+          formControlName="phone"
+          [class.error]="hasError('phone')"
+          placeholder="987654321">
+        <span class="error-message" *ngIf="hasError('phone')">
+          {{ getErrorMessage('phone') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Seguridad (solo en modo creación) -->
+  <div class="form-section" *ngIf="!isEditMode">
+    <h3 class="section-title">Seguridad</h3>
+    
+    <div class="form-row">
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="password">Contraseña <span class="required">*</span></label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          [class.error]="hasError('password')"
+          placeholder="Mínimo 8 caracteres">
+        <span class="error-message" *ngIf="hasError('password')">
+          {{ getErrorMessage('password') }}
+        </span>
+      </div>
+
+      <!-- Confirmar Contraseña -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Contraseña <span class="required">*</span></label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          formControlName="confirmPassword"
+          [class.error]="hasError('confirmPassword') || passwordMismatch"
+          placeholder="Repita la contraseña">
+        <span class="error-message" *ngIf="hasError('confirmPassword')">
+          {{ getErrorMessage('confirmPassword') }}
+        </span>
+        <span class="error-message" *ngIf="passwordMismatch">
+          Las contraseñas no coinciden
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Área (para docentes y asistentes) -->
+  <div class="form-section" *ngIf="showAreaField">
+    <h3 class="section-title">Área de Trabajo</h3>
+    
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="areaId">Área <span class="required">*</span></label>
+        <select 
+          id="areaId" 
+          formControlName="areaId"
+          [class.error]="hasError('areaId')">
+          <option value="">Seleccione un área</option>
+          <option *ngFor="let area of areas" [value]="area.id">
+            {{ area.name }}
+          </option>
+        </select>
+        <span class="error-message" *ngIf="hasError('areaId')">
+          {{ getErrorMessage('areaId') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Campos de Estudiante -->
+  <div class="form-section" *ngIf="isStudent">
+    <h3 class="section-title">Información Académica</h3>
+    
+    <div class="form-row">
+      <!-- Código de Estudiante -->
+      <div class="form-group">
+        <label for="studentId">Código de Estudiante <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="studentId" 
+          formControlName="studentId"
+          [class.error]="hasError('studentId')"
+          placeholder="Ej: 20210001">
+        <span class="error-message" *ngIf="hasError('studentId')">
+          {{ getErrorMessage('studentId') }}
+        </span>
+      </div>
+
+      <!-- Semestre -->
+      <div class="form-group">
+        <label for="semester">Semestre <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="semester" 
+          formControlName="semester"
+          [class.error]="hasError('semester')"
+          placeholder="1-12"
+          min="1"
+          max="12">
+        <span class="error-message" *ngIf="hasError('semester')">
+          {{ getErrorMessage('semester') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Campos de Docente -->
+  <div class="form-section" *ngIf="isTeacher">
+    <h3 class="section-title">Información Profesional</h3>
+    
+    <div class="form-row">
+      <!-- Especialidad -->
+      <div class="form-group">
+        <label for="specialty">Especialidad <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="specialty" 
+          formControlName="specialty"
+          [class.error]="hasError('specialty')"
+          placeholder="Ej: Derecho Civil">
+        <span class="error-message" *ngIf="hasError('specialty')">
+          {{ getErrorMessage('specialty') }}
+        </span>
+      </div>
+
+      <!-- Años de Experiencia -->
+      <div class="form-group">
+        <label for="yearsOfExperience">Años de Experiencia <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="yearsOfExperience" 
+          formControlName="yearsOfExperience"
+          [class.error]="hasError('yearsOfExperience')"
+          placeholder="0"
+          min="0">
+        <span class="error-message" *ngIf="hasError('yearsOfExperience')">
+          {{ getErrorMessage('yearsOfExperience') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Campos de Asistente -->
+  <div class="form-section" *ngIf="isAssistant">
+    <h3 class="section-title">Información del Cargo</h3>
+    
+    <div class="form-row">
+      <div class="form-group full-width">
+        <label for="position">Posición/Cargo <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="position" 
+          formControlName="position"
+          [class.error]="hasError('position')"
+          placeholder="Ej: Asistente Administrativo">
+        <span class="error-message" *ngIf="hasError('position')">
+          {{ getErrorMessage('position') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de Acción -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn btn-cancel" 
+      (click)="handleCancel()">
+      Cancelar
+    </button>
+    <button 
+      type="submit" 
+      class="btn btn-primary"
+      [disabled]="loading">
+      <i class="pi pi-spin pi-spinner" *ngIf="loading"></i>
+      {{ isEditMode ? 'Actualizar' : 'Crear Usuario' }}
+    </button>
+  </div>
+
+</form>

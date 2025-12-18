@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -10,4 +11,9 @@ import { ButtonModule } from 'primeng/button';
 })
 export class NavbarComponent {
 
+  router = inject(Router);
+
+  navigateTo(route: string): void {
+    this.router.navigate([`/${route}`]);
+  }
 }

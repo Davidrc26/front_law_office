@@ -1,0 +1,142 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Dashboard - Consultorio Jurídico</h1>
+    <p class="subtitle">Panel de Control y Estadísticas</p>
+  </div>
+
+  <!-- Tarjetas de Estadísticas -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon">
+        <i class="pi pi-briefcase"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ totalCases }}</h3>
+        <p>Total de Casos</p>
+      </div>
+    </div>
+
+    <div class="stat-card green">
+      <div class="stat-icon">
+        <i class="pi pi-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ activeCases }}</h3>
+        <p>Casos Activos</p>
+      </div>
+    </div>
+
+    <div class="stat-card purple">
+      <div class="stat-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ clientsServed }}</h3>
+        <p>Clientes Atendidos</p>
+      </div>
+    </div>
+
+    <div class="stat-card orange">
+      <div class="stat-icon">
+        <i class="pi pi-user"></i>
+      </div>
+      <div class="stat-content">
+        <h3>{{ studentsActive }}</h3>
+        <p>Estudiantes Activos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráficas -->
+  <div class="charts-grid">
+    <!-- Estado de Casos -->
+    <div class="chart-card">
+      <div class="chart-container">
+        <canvas id="casesStatusChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Casos por Estudiante -->
+    <div class="chart-card">
+      <div class="chart-container">
+        <canvas id="studentCasesChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Áreas de Derecho -->
+    <div class="chart-card">
+      <div class="chart-container">
+        <canvas id="areasChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Tendencia Mensual -->
+    <div class="chart-card wide">
+      <div class="chart-container">
+        <canvas id="monthlyTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Casos Recientes -->
+  <div class="recent-cases">
+    <h2>Casos Recientes</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Área</th>
+            <th>Estudiante Asignado</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#C-245</td>
+            <td>Roberto Méndez</td>
+            <td>Civil</td>
+            <td>María García</td>
+            <td><span class="badge status-active">En Proceso</span></td>
+            <td>15/12/2024</td>
+          </tr>
+          <tr>
+            <td>#C-244</td>
+            <td>Sofía Ramírez</td>
+            <td>Laboral</td>
+            <td>Juan Pérez</td>
+            <td><span class="badge status-active">En Proceso</span></td>
+            <td>14/12/2024</td>
+          </tr>
+          <tr>
+            <td>#C-243</td>
+            <td>Daniel Torres</td>
+            <td>Penal</td>
+            <td>Ana López</td>
+            <td><span class="badge status-pending">Pendiente</span></td>
+            <td>13/12/2024</td>
+          </tr>
+          <tr>
+            <td>#C-242</td>
+            <td>Carmen Vega</td>
+            <td>Familia</td>
+            <td>Carlos Ruiz</td>
+            <td><span class="badge status-complete">Finalizado</span></td>
+            <td>12/12/2024</td>
+          </tr>
+          <tr>
+            <td>#C-241</td>
+            <td>Luis Fernández</td>
+            <td>Administrativo</td>
+            <td>Laura Díaz</td>
+            <td><span class="badge status-active">En Proceso</span></td>
+            <td>11/12/2024</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,152 @@
+<div class="users-management-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Usuarios</h1>
+        <p class="subtitle">Administra los usuarios del consultorio jurídico</p>
+      </div>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        <i class="pi pi-plus"></i>
+        Nuevo Usuario
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar por nombre, apellido, email o usuario..."
+        (input)="onSearch($event)"
+        [value]="searchTerm">
+    </div>
+    <div class="stats">
+      <span class="stat-item">
+        <i class="pi pi-users"></i>
+        {{ filteredUsers.length }} usuario(s)
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabla de usuarios -->
+  <div class="table-container">
+    <div class="loading-overlay" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <div *ngIf="!loading && paginatedUsers.length === 0" class="empty-state">
+      <i class="pi pi-users"></i>
+      <h3>No se encontraron usuarios</h3>
+      <p *ngIf="searchTerm">Intenta con otros términos de búsqueda</p>
+    </div>
+
+    <table *ngIf="!loading && paginatedUsers.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Nombre Completo</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Rol</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of paginatedUsers">
+          <td>
+            <span class="user-id">#{{ user.id }}</span>
+          </td>
+          <td>
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ user.username}}
+              </div>
+              <span class="username">{{ user.username }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="user-name">{{ user.name }} {{ user.lastName }}</span>
+          </td>
+          <td>
+            <span class="user-email">{{ user.email }}</span>
+          </td>
+          <td>
+            <span class="user-phone">{{ user.phone }}</span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getRoleBadgeClass(user)">
+              {{ getRoleName(user) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <div class="actions-buttons">
+              <button 
+                class="btn-icon btn-edit" 
+                (click)="openEditModal(user)"
+                title="Editar usuario">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button 
+                class="btn-icon btn-delete" 
+                (click)="deleteUser(user)"
+                title="Eliminar usuario">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="!loading && filteredUsers.length > itemsPerPage">
+    <button 
+      class="pagination-btn"
+      [disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)">
+      <i class="pi pi-chevron-left"></i>
+    </button>
+
+    <button 
+      *ngFor="let page of pageNumbers"
+      class="pagination-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)">
+      {{ page }}
+    </button>
+
+    <button 
+      class="pagination-btn"
+      [disabled]="currentPage === totalPages"
+      (click)="changePage(currentPage + 1)">
+      <i class="pi pi-chevron-right"></i>
+    </button>
+
+    <span class="pagination-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+  </div>
+</div>
+
+<!-- Modal con Formulario de Usuario -->
+<app-modal
+  [isOpen]="isModalOpen"
+  [title]="isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'"
+  size="large"
+  [showFooter]="false"
+  (onClose)="closeModal()">
+  
+  <app-user-form
+    [user]="selectedUser"
+    [isEditMode]="isEditMode"
+    (onSubmit)="handleUserSubmit($event)"
+    (onCancel)="closeModal()">
+  </app-user-form>
+  
+</app-modal>
