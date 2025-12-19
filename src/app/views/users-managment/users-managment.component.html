@@ -135,18 +135,20 @@
 </div>
 
 <!-- Modal con Formulario de Usuario -->
-<app-modal
-  [isOpen]="isModalOpen"
-  [title]="isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'"
-  size="large"
-  [showFooter]="false"
-  (onClose)="closeModal()">
-  
-  <app-user-form
-    [user]="selectedUser"
-    [isEditMode]="isEditMode"
-    (onSubmit)="handleUserSubmit($event)"
-    (onCancel)="closeModal()">
-  </app-user-form>
-  
-</app-modal>
+ @if(isModalOpen){
+   <app-modal 
+     [isOpen]="isModalOpen"
+     [title]="isEditMode ? 'Editar Usuario' : 'Nuevo Usuario'"
+     size="large"
+     [showFooter]="false"
+     (onClose)="closeModal()">
+     
+     <app-user-form
+       [user]="selectedUser"
+       [isEditMode]="isEditMode"
+       (onSubmit)="handleUserSubmit($event)"
+       (onCancel)="closeModal()">
+     </app-user-form>
+     
+   </app-modal>
+ }

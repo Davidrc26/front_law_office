@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CreateStudentDTO, StudentProfile, User } from '../../models/user';
+import { CreateStudentDTO, CreateUserDTO, StudentProfile, User } from '../../models/user';
 import { Role } from '../../models/role';
 import { Area } from '../../models/area';
 import { RoleService } from '../../services/role.service';
@@ -17,7 +17,7 @@ import { UserRegisterService } from '../../services/user-register.service';
 export class UserFormComponent implements OnInit {
   @Input() user?: User;
   @Input() isEditMode: boolean = false;
-  @Output() onSubmit = new EventEmitter<User | CreateStudentDTO>();
+  @Output() onSubmit = new EventEmitter<CreateUserDTO>();
   @Output() onCancel = new EventEmitter<void>();
 
   userForm!: FormGroup;
@@ -28,8 +28,6 @@ export class UserFormComponent implements OnInit {
 
   // Tipos de rol según nombre (ajusta según tu backend)
   readonly ROLE_STUDENT = 'STUDENT';
-  readonly ROLE_TEACHER = 'TEACHER';
-  readonly ROLE_ASSISTANT = 'ASSISTANT';
 
   constructor(
     private fb: FormBuilder,
@@ -43,7 +41,7 @@ export class UserFormComponent implements OnInit {
     this.loadRoles();
     this.loadAreas();
     this.setupRoleChangeListener();
-
+    
     if (this.user && this.isEditMode) {
       this.patchFormValues();
     }
@@ -67,21 +65,11 @@ export class UserFormComponent implements OnInit {
       confirmPassword: ['', this.isEditMode ? [] : [Validators.required]],
       roleIds: [[], Validators.required],
       
-      // Campo condicional (docentes y asistentes)
-      areaId: [''],
-      
       // Campos específicos de estudiante
       studentCode: [''],
       semester: [''],
       enrollmentDate: [''],
-      university: [''],
-      
-      // Campos específicos de docente
-      specialty: [''],
-      yearsOfExperience: [''],
-      
-      // Campos específicos de asistente
-      position: ['']
+      university: ['']
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -128,13 +116,6 @@ export class UserFormComponent implements OnInit {
       this.userForm.get('semester')?.setValidators([Validators.required, Validators.min(1), Validators.max(12)]);
       this.userForm.get('enrollmentDate')?.setValidators([Validators.required]);
       this.userForm.get('university')?.setValidators([Validators.required]);
-    } else if (roleName === this.ROLE_TEACHER) {
-      this.userForm.get('areaId')?.setValidators([Validators.required]);
-      this.userForm.get('specialty')?.setValidators([Validators.required, Validators.minLength(3)]);
-      this.userForm.get('yearsOfExperience')?.setValidators([Validators.required, Validators.min(0)]);
-    } else if (roleName === this.ROLE_ASSISTANT) {
-      this.userForm.get('areaId')?.setValidators([Validators.required]);
-      this.userForm.get('position')?.setValidators([Validators.required]);
     }
 
     // Actualizar la validez de los campos
@@ -145,28 +126,20 @@ export class UserFormComponent implements OnInit {
    * Limpia los validadores condicionales
    */
   private clearConditionalValidators(): void {
-    this.userForm.get('areaId')?.clearValidators();
     this.userForm.get('studentCode')?.clearValidators();
     this.userForm.get('semester')?.clearValidators();
     this.userForm.get('enrollmentDate')?.clearValidators();
     this.userForm.get('university')?.clearValidators();
-    this.userForm.get('specialty')?.clearValidators();
-    this.userForm.get('yearsOfExperience')?.clearValidators();
-    this.userForm.get('position')?.clearValidators();
   }
 
   /**
    * Actualiza la validez de todos los campos condicionales
    */
   private updateFieldsValidity(): void {
-    this.userForm.get('areaId')?.updateValueAndValidity();
     this.userForm.get('studentCode')?.updateValueAndValidity();
     this.userForm.get('semester')?.updateValueAndValidity();
     this.userForm.get('enrollmentDate')?.updateValueAndValidity();
     this.userForm.get('university')?.updateValueAndValidity();
-    this.userForm.get('specialty')?.updateValueAndValidity();
-    this.userForm.get('yearsOfExperience')?.updateValueAndValidity();
-    this.userForm.get('position')?.updateValueAndValidity();
   }
 
   /**
@@ -229,22 +202,6 @@ export class UserFormComponent implements OnInit {
     return role?.name.toUpperCase() === this.ROLE_STUDENT;
   }
 
-  get isTeacher(): boolean {
-    const roleIds = this.userForm.get('roleIds')?.value || [];
-    const role = this.roles.find(r => roleIds.includes(r.id));
-    return role?.name.toUpperCase() === this.ROLE_TEACHER;
-  }
-
-  get isAssistant(): boolean {
-    const roleIds = this.userForm.get('roleIds')?.value || [];
-    const role = this.roles.find(r => roleIds.includes(r.id));
-    return role?.name.toUpperCase() === this.ROLE_ASSISTANT;
-  }
-
-  get showAreaField(): boolean {
-    return this.isTeacher || this.isAssistant;
-  }
-
   /**
    * Maneja el envío del formulario
    */
@@ -259,46 +216,22 @@ export class UserFormComponent implements OnInit {
     const formValue = this.userForm.value;
     
     // Construir objeto según el modelo CreateUserDTO
-    const userData: any = {
-      email: formValue.email,
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
-      documentNumber: formValue.documentNumber,
-      documentTypeId: Number(formValue.documentTypeId),
-      roleIds: formValue.roleIds || [],
-      ...(formValue.secondName && { secondName: formValue.secondName }),
-      ...(formValue.secondLastName && { secondLastName: formValue.secondLastName }),
-      ...(formValue.phone && { phone: formValue.phone }),
-      ...(formValue.password && { password: formValue.password })
-    };
+    const userData: CreateUserDTO = {
+      ...formValue
+    }
 
-    // Si es estudiante, crear estructura CreateStudentDTO
+    // Si es estudiante, agregar studentProfile
     if (this.isStudent) {
-      const studentData = {
-        user: userData,
+      userData.studentProfile = {
         studentCode: formValue.studentCode,
         semester: Number(formValue.semester),
         enrollmentDate: formValue.enrollmentDate,
         university: formValue.university
       };
-      this.onSubmit.emit(studentData);
-      return;
-    }
-
-    // Agregar campos específicos según el rol (para no-estudiantes)
-    if (this.showAreaField && formValue.areaId) {
-      userData.areaId = Number(formValue.areaId);
-    }
-
-    if (this.isTeacher) {
-      userData.specialty = formValue.specialty;
-      userData.yearsOfExperience = Number(formValue.yearsOfExperience);
-    } else if (this.isAssistant) {
-      userData.position = formValue.position;
     }
 
     if (this.isEditMode && this.user?.id) {
-      userData.id = this.user.id;
+      (userData as any).id = this.user.id;
     }
 
     this.onSubmit.emit(userData);

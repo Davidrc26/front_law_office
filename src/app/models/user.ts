@@ -25,7 +25,7 @@ export interface User {
   professorProfile?: any; // Define según sea necesario
 }
 
-// models/CreateUserDTO.ts
+
 export interface CreateUserDTO {
   password: string;
   email: string;
@@ -37,11 +37,12 @@ export interface CreateUserDTO {
   documentTypeId: number;
   roleIds: number[];
   phone?: string;
+  studentProfile?: CreateStudentDTO;
+  professorProfile?: any; // Define según sea necesario
+  assistantProfile?: any; // Define según sea necesario
 }
 
-// models/CreateStudentDTO.ts
 export interface CreateStudentDTO {
-  user: CreateUserDTO;
   studentCode: string;
   semester: number;
   enrollmentDate: string; // ISO date string (YYYY-MM-DD)

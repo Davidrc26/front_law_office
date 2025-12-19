@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { CreateStudentDTO, User } from '../models/user';
 
 interface CreateUserDTO {
   username: string;
@@ -32,8 +33,15 @@ export class UserRegisterService {
    * Obtiene la lista de todos los usuarios registrados.
    * @returns Observable con el arreglo de usuarios.
    */
-  getAllUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/users/all`);
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${environment.apiUrl}/users/all`);
   }
+
+
+  createUser(userData: CreateUserDTO): Observable<User> {
+    return this.http.post<User>(`${environment.apiUrl}/users/create`, userData);
+  }
+
+
 
 }

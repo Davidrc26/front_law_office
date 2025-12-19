@@ -71,9 +71,8 @@ export default class UsersManagmentComponent implements OnInit {
    * Abre el modal para editar un usuario existente
    */
   openEditModal(user: User): void {
-    this.isEditMode = true;
-    // User ya tiene la estructura correcta
     this.selectedUser = user;
+    this.isEditMode = true;
     this.isModalOpen = true;
   }
 

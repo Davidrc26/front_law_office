@@ -26,6 +26,7 @@
           id="roleIds" 
           formControlName="roleIds"
           [class.error]="hasError('roleIds')">
+          <option value="">Seleccione un rol</option>
           <option *ngFor="let role of roles" [value]="role.id">
             {{ role.spanishName }}
           </option>
@@ -185,7 +186,7 @@
   </div>
 
   <!-- Sección: Área (para docentes y asistentes) -->
-  <div class="form-section" *ngIf="showAreaField">
+ <!--  <div class="form-section" *ngIf="showAreaField">
     <h3 class="section-title">Área de Trabajo</h3>
     
     <div class="form-row">
@@ -206,7 +207,7 @@
       </div>
     </div>
   </div>
-
+ -->
   <!-- Sección: Campos de Estudiante -->
   <div class="form-section" *ngIf="isStudent">
     <h3 class="section-title">Información Académica</h3>
@@ -274,7 +275,7 @@
   </div>
 
   <!-- Sección: Campos de Docente -->
-  <div class="form-section" *ngIf="isTeacher">
+  <!-- <div class="form-section" *ngIf="isTeacher">
     <h3 class="section-title">Información Profesional</h3>
     
     <div class="form-row">
@@ -292,7 +293,7 @@
         </span>
       </div>
 
-      <!-- Años de Experiencia -->
+      <!-- Años de Experiencia 
       <div class="form-group">
         <label for="yearsOfExperience">Años de Experiencia <span class="required">*</span></label>
         <input 
@@ -307,10 +308,10 @@
         </span>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Sección: Campos de Asistente -->
-  <div class="form-section" *ngIf="isAssistant">
+  <!-- <div class="form-section" *ngIf="isAssistant">
     <h3 class="section-title">Información del Cargo</h3>
     
     <div class="form-row">
@@ -327,7 +328,7 @@
         </span>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Botones de Acción -->
   <div class="form-actions">
