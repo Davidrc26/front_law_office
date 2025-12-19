@@ -19,7 +19,7 @@
       <i class="pi pi-search"></i>
       <input 
         type="text" 
-        placeholder="Buscar por nombre, apellido, email o usuario..."
+        placeholder="Buscar por nombre, apellido, email o documento..."
         (input)="onSearch($event)"
         [value]="searchTerm">
     </div>
@@ -48,8 +48,8 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Usuario</th>
           <th>Nombre Completo</th>
+          <th>Documento</th>
           <th>Email</th>
           <th>Teléfono</th>
           <th>Rol</th>
@@ -64,19 +64,19 @@
           <td>
             <div class="user-info">
               <div class="user-avatar">
-                {{ user.username}}
+                {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
               </div>
-              <span class="username">{{ user.username }}</span>
+              <span class="username">{{ user.firstName }} {{ user.secondName || '' }} {{ user.lastName }} {{ user.secondLastName || '' }}</span>
             </div>
           </td>
           <td>
-            <span class="user-name">{{ user.name }} {{ user.lastName }}</span>
+            <span class="user-document">{{ user.documentNumber }}</span>
           </td>
           <td>
             <span class="user-email">{{ user.email }}</span>
           </td>
           <td>
-            <span class="user-phone">{{ user.phone }}</span>
+            <span class="user-phone">{{ user.phone || 'N/A' }}</span>
           </td>
           <td>
             <span class="badge" [ngClass]="getRoleBadgeClass(user)">

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../layout/modal/modal.component';
 import { UserFormComponent } from '../../forms/user-form/user-form.component';
-import { User, UserResponse } from '../../models/user';
+import { CreateStudentDTO, User } from '../../models/user';
 import { UserRegisterService } from '../../services/user-register.service';
 import { AlertService } from '../../services/alerts.service';
 
@@ -13,8 +13,8 @@ import { AlertService } from '../../services/alerts.service';
   styleUrl: './users-managment.component.scss'
 })
 export default class UsersManagmentComponent implements OnInit {
-  users: UserResponse[] = [];
-  filteredUsers: UserResponse[] = [];
+  users: User[] = [];
+  filteredUsers: User[] = [];
   isModalOpen = false;
   selectedUser?: User;
   isEditMode = false;
@@ -70,31 +70,17 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Abre el modal para editar un usuario existente
    */
-  openEditModal(user: UserResponse): void {
+  openEditModal(user: User): void {
     this.isEditMode = true;
-    // Convertir UserResponse a User para el formulario
-    this.selectedUser = {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      roleId: user.roleId,
-      areaId: user.areaId,
-      studentId: user.studentId,
-      semester: user.semester,
-      specialty: user.specialty,
-      yearsOfExperience: user.yearsOfExperience,
-      position: user.position
-    };
+    // User ya tiene la estructura correcta
+    this.selectedUser = user;
     this.isModalOpen = true;
   }
 
   /**
    * Maneja el envío del formulario (crear o actualizar)
    */
-  handleUserSubmit(userData: User): void {
+  handleUserSubmit(userData: any): void {
     if (this.isEditMode) {
       this.updateUser(userData);
     } else {
@@ -161,10 +147,11 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Elimina un usuario
    */
-  deleteUser(user: UserResponse): void {
+  deleteUser(user: User): void {
+    const fullName = `${user.firstName} ${user.secondName || ''} ${user.lastName} ${user.secondLastName || ''}`.trim();
     this.alertService.confirm(
       '¿Eliminar usuario?',
-      `¿Estás seguro de que deseas eliminar a ${user.name} ${user.lastName}? Esta acción no se puede deshacer.`
+      `¿Estás seguro de que deseas eliminar a ${fullName}? Esta acción no se puede deshacer.`
     ).then((result) => {
       if (result.isConfirmed) {
         this.confirmDelete(user.id!);
@@ -227,10 +214,12 @@ export default class UsersManagmentComponent implements OnInit {
       this.filteredUsers = [...this.users];
     } else {
       this.filteredUsers = this.users.filter(user => 
-        user.name.toLowerCase().includes(this.searchTerm) ||
+        user.firstName.toLowerCase().includes(this.searchTerm) ||
+        user.secondName?.toLowerCase().includes(this.searchTerm) ||
         user.lastName.toLowerCase().includes(this.searchTerm) ||
+        user.secondLastName?.toLowerCase().includes(this.searchTerm) ||
         user.email.toLowerCase().includes(this.searchTerm) ||
-        user.username.toLowerCase().includes(this.searchTerm)
+        user.documentNumber.toLowerCase().includes(this.searchTerm)
       );
     }
     this.currentPage = 1;
@@ -247,7 +236,7 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Obtiene los usuarios de la página actual
    */
-  get paginatedUsers(): UserResponse[] {
+  get paginatedUsers(): User[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredUsers.slice(startIndex, endIndex);
@@ -265,9 +254,9 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Obtiene el nombre del rol en español
    */
-  getRoleName(user: UserResponse): string {
+  getRoleName(user: User): string {
     if (user.roles && user.roles.length > 0) {
-      return user.roles[0].spanishName;
+      return user.roles[0].spanishName || user.roles[0].name;
     }
     return 'N/A';
   }
@@ -275,13 +264,14 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Obtiene la clase CSS del badge según el rol
    */
-  getRoleBadgeClass(user: UserResponse): string {
+  getRoleBadgeClass(user: User): string {
     if (user.roles && user.roles.length > 0) {
       const roleName = user.roles[0].name.toUpperCase();
       switch(roleName) {
         case 'STUDENT':
           return 'badge-student';
         case 'TEACHER':
+        case 'PROFESSOR':
           return 'badge-teacher';
         case 'ASSISTANT':
           return 'badge-assistant';

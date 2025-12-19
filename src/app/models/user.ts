@@ -1,25 +1,49 @@
 import { Role } from "./role";
 
-export interface User {
-    id?: number;
-    username: string;
-    name: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    password?: string;
-    roleId: number;
-    areaId?: number;
-    // Campos específicos de estudiante
-    studentId?: string;
-    semester?: number;
-    // Campos específicos de docente
-    specialty?: string;
-    yearsOfExperience?: number;
-    // Campos específicos de asistente
-    position?: string;
+
+export interface StudentProfile {
+  id: number;
+  studentCode: string;
+  semester: number;
+  enrollmentDate: string; // ISO date string (YYYY-MM-DD)
+  university: string;
 }
 
-export interface UserResponse extends Omit<User, 'password'> {
-    roles: Role[];
+export interface User {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  secondName?: string;
+  secondLastName?: string;
+  documentNumber: string;
+  documentTypeId: number;
+  roles: Role[];
+  phone?: string;
+  studentProfile?: StudentProfile;
+  assistantProfile?: any; // Define según sea necesario
+  professorProfile?: any; // Define según sea necesario
+}
+
+// models/CreateUserDTO.ts
+export interface CreateUserDTO {
+  password: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  secondName?: string;
+  secondLastName?: string;
+  documentNumber: string;
+  documentTypeId: number;
+  roleIds: number[];
+  phone?: string;
+}
+
+// models/CreateStudentDTO.ts
+export interface CreateStudentDTO {
+  user: CreateUserDTO;
+  studentCode: string;
+  semester: number;
+  enrollmentDate: string; // ISO date string (YYYY-MM-DD)
+  university: string;
 }

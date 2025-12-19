@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { User } from '../../models/user';
+import { CreateStudentDTO, StudentProfile, User } from '../../models/user';
 import { Role } from '../../models/role';
 import { Area } from '../../models/area';
 import { RoleService } from '../../services/role.service';
@@ -17,7 +17,7 @@ import { UserRegisterService } from '../../services/user-register.service';
 export class UserFormComponent implements OnInit {
   @Input() user?: User;
   @Input() isEditMode: boolean = false;
-  @Output() onSubmit = new EventEmitter<User>();
+  @Output() onSubmit = new EventEmitter<User | CreateStudentDTO>();
   @Output() onCancel = new EventEmitter<void>();
 
   userForm!: FormGroup;
@@ -55,21 +55,26 @@ export class UserFormComponent implements OnInit {
   private initForm(): void {
     this.userForm = this.fb.group({
       // Campos comunes para todos los usuarios
-      username: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{9,15}$/)]],
+      firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      secondName: [''],
+      lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
+      secondLastName: [''],
+      documentNumber: ['', [Validators.required]],
+      documentTypeId: ['', [Validators.required]],
+      phone: [''],
       password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', this.isEditMode ? [] : [Validators.required]],
-      roleId: ['', Validators.required],
+      roleIds: [[], Validators.required],
       
       // Campo condicional (docentes y asistentes)
       areaId: [''],
       
       // Campos específicos de estudiante
-      studentId: [''],
+      studentCode: [''],
       semester: [''],
+      enrollmentDate: [''],
+      university: [''],
       
       // Campos específicos de docente
       specialty: [''],
@@ -98,16 +103,18 @@ export class UserFormComponent implements OnInit {
    * Configura el listener para cambios en el rol seleccionado
    */
   private setupRoleChangeListener(): void {
-    this.userForm.get('roleId')?.valueChanges.subscribe((roleId) => {
-      this.updateFieldValidators(roleId);
+    this.userForm.get('roleIds')?.valueChanges.subscribe((roleIds) => {
+      this.updateFieldValidators(roleIds);
     });
   }
 
   /**
    * Actualiza los validadores de los campos según el rol seleccionado
    */
-  private updateFieldValidators(roleId: number): void {
-    const selectedRole = this.roles.find(r => r.id === Number(roleId));
+  private updateFieldValidators(roleIds: number[]): void {
+    if (!roleIds || roleIds.length === 0) return;
+
+    const selectedRole = this.roles.find(r => roleIds.includes(r.id));
     if (!selectedRole) return;
 
     const roleName = selectedRole.name.toUpperCase();
@@ -117,8 +124,10 @@ export class UserFormComponent implements OnInit {
 
     // Aplicar validadores según el rol
     if (roleName === this.ROLE_STUDENT) {
-      this.userForm.get('studentId')?.setValidators([Validators.required]);
+      this.userForm.get('studentCode')?.setValidators([Validators.required]);
       this.userForm.get('semester')?.setValidators([Validators.required, Validators.min(1), Validators.max(12)]);
+      this.userForm.get('enrollmentDate')?.setValidators([Validators.required]);
+      this.userForm.get('university')?.setValidators([Validators.required]);
     } else if (roleName === this.ROLE_TEACHER) {
       this.userForm.get('areaId')?.setValidators([Validators.required]);
       this.userForm.get('specialty')?.setValidators([Validators.required, Validators.minLength(3)]);
@@ -137,8 +146,10 @@ export class UserFormComponent implements OnInit {
    */
   private clearConditionalValidators(): void {
     this.userForm.get('areaId')?.clearValidators();
-    this.userForm.get('studentId')?.clearValidators();
+    this.userForm.get('studentCode')?.clearValidators();
     this.userForm.get('semester')?.clearValidators();
+    this.userForm.get('enrollmentDate')?.clearValidators();
+    this.userForm.get('university')?.clearValidators();
     this.userForm.get('specialty')?.clearValidators();
     this.userForm.get('yearsOfExperience')?.clearValidators();
     this.userForm.get('position')?.clearValidators();
@@ -149,8 +160,10 @@ export class UserFormComponent implements OnInit {
    */
   private updateFieldsValidity(): void {
     this.userForm.get('areaId')?.updateValueAndValidity();
-    this.userForm.get('studentId')?.updateValueAndValidity();
+    this.userForm.get('studentCode')?.updateValueAndValidity();
     this.userForm.get('semester')?.updateValueAndValidity();
+    this.userForm.get('enrollmentDate')?.updateValueAndValidity();
+    this.userForm.get('university')?.updateValueAndValidity();
     this.userForm.get('specialty')?.updateValueAndValidity();
     this.userForm.get('yearsOfExperience')?.updateValueAndValidity();
     this.userForm.get('position')?.updateValueAndValidity();
@@ -191,18 +204,19 @@ export class UserFormComponent implements OnInit {
     if (!this.user) return;
 
     this.userForm.patchValue({
-      username: this.user.username,
-      name: this.user.name,
-      lastName: this.user.lastName,
       email: this.user.email,
+      firstName: this.user.firstName,
+      secondName: this.user.secondName,
+      lastName: this.user.lastName,
+      secondLastName: this.user.secondLastName,
+      documentNumber: this.user.documentNumber,
+      documentTypeId: this.user.documentTypeId,
       phone: this.user.phone,
-      roleId: this.user.roleId,
-      areaId: this.user.areaId,
-      studentId: this.user.studentId,
-      semester: this.user.semester,
-      specialty: this.user.specialty,
-      yearsOfExperience: this.user.yearsOfExperience,
-      position: this.user.position
+      roleIds: this.user.roles?.map(r => r.id) || [],
+      studentCode: this.user.studentProfile?.studentCode,
+      semester: this.user.studentProfile?.semester,
+      enrollmentDate: this.user.studentProfile?.enrollmentDate,
+      university: this.user.studentProfile?.university
     });
   }
 
@@ -210,20 +224,20 @@ export class UserFormComponent implements OnInit {
    * Determina si se deben mostrar campos específicos según el rol
    */
   get isStudent(): boolean {
-    const roleId = this.userForm.get('roleId')?.value;
-    const role = this.roles.find(r => r.id === Number(roleId));
+    const roleIds = this.userForm.get('roleIds')?.value || [];
+    const role = this.roles.find(r => roleIds.includes(r.id));
     return role?.name.toUpperCase() === this.ROLE_STUDENT;
   }
 
   get isTeacher(): boolean {
-    const roleId = this.userForm.get('roleId')?.value;
-    const role = this.roles.find(r => r.id === Number(roleId));
+    const roleIds = this.userForm.get('roleIds')?.value || [];
+    const role = this.roles.find(r => roleIds.includes(r.id));
     return role?.name.toUpperCase() === this.ROLE_TEACHER;
   }
 
   get isAssistant(): boolean {
-    const roleId = this.userForm.get('roleId')?.value;
-    const role = this.roles.find(r => r.id === Number(roleId));
+    const roleIds = this.userForm.get('roleIds')?.value || [];
+    const role = this.roles.find(r => roleIds.includes(r.id));
     return role?.name.toUpperCase() === this.ROLE_ASSISTANT;
   }
 
@@ -244,26 +258,39 @@ export class UserFormComponent implements OnInit {
 
     const formValue = this.userForm.value;
     
-    // Limpiar campos no relevantes según el rol
-    const userData: User = {
-      username: formValue.username,
-      name: formValue.name,
-      lastName: formValue.lastName,
+    // Construir objeto según el modelo CreateUserDTO
+    const userData: any = {
       email: formValue.email,
-      phone: formValue.phone,
-      roleId: Number(formValue.roleId),
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      documentNumber: formValue.documentNumber,
+      documentTypeId: Number(formValue.documentTypeId),
+      roleIds: formValue.roleIds || [],
+      ...(formValue.secondName && { secondName: formValue.secondName }),
+      ...(formValue.secondLastName && { secondLastName: formValue.secondLastName }),
+      ...(formValue.phone && { phone: formValue.phone }),
       ...(formValue.password && { password: formValue.password })
     };
 
-    // Agregar campos específicos según el rol
-    if (this.showAreaField) {
+    // Si es estudiante, crear estructura CreateStudentDTO
+    if (this.isStudent) {
+      const studentData = {
+        user: userData,
+        studentCode: formValue.studentCode,
+        semester: Number(formValue.semester),
+        enrollmentDate: formValue.enrollmentDate,
+        university: formValue.university
+      };
+      this.onSubmit.emit(studentData);
+      return;
+    }
+
+    // Agregar campos específicos según el rol (para no-estudiantes)
+    if (this.showAreaField && formValue.areaId) {
       userData.areaId = Number(formValue.areaId);
     }
 
-    if (this.isStudent) {
-      userData.studentId = formValue.studentId;
-      userData.semester = Number(formValue.semester);
-    } else if (this.isTeacher) {
+    if (this.isTeacher) {
       userData.specialty = formValue.specialty;
       userData.yearsOfExperience = Number(formValue.yearsOfExperience);
     } else if (this.isAssistant) {
