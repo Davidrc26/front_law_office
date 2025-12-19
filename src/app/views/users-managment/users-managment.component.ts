@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../../layout/modal/modal.component';
 import { UserFormComponent } from '../../forms/user-form/user-form.component';
-import { CreateStudentDTO, User } from '../../models/user';
+import { CreateStudentDTO, CreateUserDTO, User } from '../../models/user';
 import { UserRegisterService } from '../../services/user-register.service';
 import { AlertService } from '../../services/alerts.service';
 
@@ -90,10 +90,10 @@ export default class UsersManagmentComponent implements OnInit {
   /**
    * Crea un nuevo usuario
    */
-  private createUser(userData: User): void {
+  private createUser(userData: CreateUserDTO): void {
     this.alertService.loading('Creando usuario...');
     
-    this.userService.registerUser(userData as any).subscribe({
+    this.userService.createUser(userData as any).subscribe({
       next: (response) => {
         this.alertService.success(
           '¡Usuario creado!',

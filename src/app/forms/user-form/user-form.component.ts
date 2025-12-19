@@ -54,6 +54,7 @@ export class UserFormComponent implements OnInit {
     this.userForm = this.fb.group({
       // Campos comunes para todos los usuarios
       email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       secondName: [''],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
@@ -215,12 +216,20 @@ export class UserFormComponent implements OnInit {
 
     const formValue = this.userForm.value;
     
-    // Construir objeto según el modelo CreateUserDTO
     const userData: CreateUserDTO = {
-      ...formValue
+      email: formValue.email,
+      username: formValue.username,
+      firstName: formValue.firstName,
+      secondName: formValue.secondName,
+      lastName: formValue.lastName,
+      secondLastName: formValue.secondLastName,
+      documentNumber: formValue.documentNumber,
+      documentTypeId: Number(formValue.documentTypeId),
+      roleIds: [Number(formValue.roleIds)],
+      password: formValue.password,
+      phone: formValue.phone
     }
 
-    // Si es estudiante, agregar studentProfile
     if (this.isStudent) {
       userData.studentProfile = {
         studentCode: formValue.studentCode,

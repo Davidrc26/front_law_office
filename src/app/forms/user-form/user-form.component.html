@@ -19,6 +19,22 @@
         </span>
       </div>
 
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Nombre de Usuario <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          [class.error]="hasError('username')"
+          placeholder="usuario123">
+        <span class="error-message" *ngIf="hasError('username')">
+          {{ getErrorMessage('username') }}
+        </span>
+      </div>
+    </div>
+
+    <div class="form-row">
       <!-- Rol -->
       <div class="form-group">
         <label for="roleIds">Rol <span class="required">*</span></label>
@@ -279,7 +295,7 @@
     <h3 class="section-title">Información Profesional</h3>
     
     <div class="form-row">
-      <!-- Especialidad -->
+      <!-- Especialidad 
       <div class="form-group">
         <label for="specialty">Especialidad <span class="required">*</span></label>
         <input 
